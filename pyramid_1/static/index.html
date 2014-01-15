@@ -1,0 +1,50 @@
+<!doctype html>
+<html>
+    <head>
+        <title>Backbone/Pyramid - A Gradual Journey</title>
+        <link href="//netdna.bootstrapcdn.com/bootstrap/3.0.3/css/bootstrap.min.css" rel="stylesheet">
+    </head>
+    <body>
+        <div class="container">
+            <h1>Backbone/Pyramid</h1>
+            <h2>Users</h2>
+            <hr />
+            <div class="page"></div>
+        </div>
+        <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+        <script src="//cdnjs.cloudflare.com/ajax/libs/underscore.js/1.5.2/underscore-min.js"></script>
+        <script src="//cdnjs.cloudflare.com/ajax/libs/backbone.js/1.1.0/backbone-min.js"></script>
+        <script>
+            var Users = Backbone.Collection.extend({
+                url: '/users'
+            });
+
+            var UserList = Backbone.View.extend({
+                el: '.page',
+                render: function() {
+                    var users = new Users();
+                    users.fetch({
+                        success: function() {
+                            this.$el.html("CONTENT GET!");
+                        }
+                    });
+                }
+            });
+
+            var Router = Backbone.Router.extend({
+                routes: {
+                    '': 'home'
+                }
+            });
+
+            var userlist = new UserList();
+            var router = new Router();
+
+            router.on('route:home', function() {
+                userlist.render();
+            });
+
+            Backbone.history.start();
+        </script>
+    </body>
+</html>
