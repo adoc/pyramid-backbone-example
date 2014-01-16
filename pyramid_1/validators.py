@@ -19,16 +19,24 @@ def validate(params=None, match=None):
         raise ValueError("`match` expected a `formencode.Schema` type.")
     def _decorator(view_callable):
         def _inner(context, request):
-            if params:
+            def validate_params(this):
                 try:
-                    request.params = params.to_python(request.params)
+                    return params.to_python(request.params)
                 except Invalid:
                     raise exc.HTTPBadRequest()
-            if match:
+
+            def validate_match(this):
                 try:
-                    request.matchdict = match.to_python(request.matchdict)
+                    return match.to_python(request.matchdict)
                 except Invalid:
                     raise exc.HTTPNotFound()
+
+            if params:
+                request.set_property(validate_params, 'validated_params',
+                                        reify=True)
+            if match:
+                request.set_property(validate_match, 'validated_matchdict',
+                                        reify=True)
             return view_callable(context, request)
         return _inner
     return _decorator

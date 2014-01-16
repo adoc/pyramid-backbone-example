@@ -17,7 +17,7 @@ def get_user(view_callable):
     def _inner(context, request):
         def query(this):
             print(this)
-            id_ = request.matchdict['id']
+            id_ = request.validated_matchdict['id']
             user = DBSession.query(User).get(id_)
             if user:
                 return user
@@ -49,12 +49,12 @@ def users_get(request):
 def users_post(request):
     """Create a new user."""
 
-    name = request.params['name']    
-    value = request.params['value']
+    name = request.validated_params['name']    
+    value = request.validated_params['value']
     user = User(name=name, value=value)
 
     DBSession.add(user)
-    DBCommit()
+    DBSession.flush()
     return userdict(user)
 
 
@@ -75,8 +75,8 @@ def user_put(request):
     """Update an existing user with `id`"""
 
     user = request.user
-    name = request.params['name']
-    value = request.params['value']
+    name = request.validated_params['name']
+    value = request.validated_params['value']
     
     user.name = name
     user.value = value
