@@ -1,6 +1,7 @@
 <!doctype html>
 <html>
     <head>
+        <!-- Inspired by http://backbonetutorials.com/videos/beginner/ /-->
         <title>Backbone/Pyramid - A Gradual Journey</title>
         <link href="//netdna.bootstrapcdn.com/bootstrap/3.0.3/css/bootstrap.min.css" rel="stylesheet">
     </head>
@@ -11,23 +12,142 @@
             <hr />
             <div class="page"></div>
         </div>
+        <script type="text/template" id="tmpl_user_list">
+            <form id="users_form">
+            <table class="table striped">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Awesomeness<br />Rating</th>
+                        <th><em>Do</em></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><input type="text" name="new_name" size="32" maxlength="32" /></td>
+                        <td><input type="text" name="new_value" size="3" maxlength="3" /></td>
+                        <td><button type="button" name="new" class="btn">New User</button></td>
+                    </tr>
+                  <% _.each(users, function(user) { %>
+                    <tr>
+                      <% if (edit && user.get('id') == edit) { %>
+                        <td><input type="text" name="edit_name" value="<%=user.get('name')%>" size="32" maxlength="32" /></td>
+                        <td><input type="text" name="edit_value" value="<%=user.get('value')%>" size="3" maxlength="3" /></td>
+                        <td><button type="button" name="save" class="btn" data-id="<%=user.get('id')%>">Save</button></td>
+                      <% } else { %>
+                        <td><%=user.get('name')%></td>
+                        <td><%=user.get('value')%></td>
+                        <td>
+                            <button type="button" name="edit" class="btn" data-id="<%=user.get('id')%>">Edit</button>
+                            <button type="button" name="delete" class="btn" data-id="<%=user.get('id')%>">Delete</button>
+                        </td>
+                      <% } %>     
+                    </tr>
+                  <% }); %>
+                </tbody>
+            </table>
+            </form>
+        </script>
+
         <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
         <script src="//cdnjs.cloudflare.com/ajax/libs/underscore.js/1.5.2/underscore-min.js"></script>
         <script src="//cdnjs.cloudflare.com/ajax/libs/backbone.js/1.1.0/backbone-min.js"></script>
+        <script src="//cdnjs.cloudflare.com/ajax/libs/jquery-serialize-object/2.0.0/jquery.serialize-object.compiled.js"></script>
         <script>
             var Users = Backbone.Collection.extend({
                 url: '/users'
             });
 
+            var User = Backbone.Model.extend({
+                urlRoot: '/users'
+            });
+
             var UserList = Backbone.View.extend({
                 el: '.page',
+                events: {
+                    'click button[name="new"]': 'newUser',
+                    'click button[name="save"]': 'saveUser',
+                    'click button[name="edit"]': 'editUser',
+                    'click button[name="delete"]': 'deleteUser'
+                },
+                initialize: function(users, user) {
+                    /* Init the UserList view */
+                    this.users = users;
+                    this.user = user;
+                    this.user.on('change', this.renderOnly, this);
+                    this.users.on('add', this.renderOnly, this);
+                    this.users.on('remove', this.renderOnly, this);
+                },
+                renderOnly: function(edit) {
+                    /* Render the data/template only. */
+                    var template = _.template($("#tmpl_user_list").html(), {
+                            users: this.users.models,
+                            edit: edit
+                        });
+                    this.$el.html(template);
+                },
                 render: function() {
-                    var users = new Users();
-                    users.fetch({
+                    /* Fetch data model and render template. */
+                    var that = this;
+                    that.users.fetch({
                         success: function() {
-                            this.$el.html("CONTENT GET!");
+                            that.renderOnly();
                         }
                     });
+                },
+                selectUser: function(id) {
+                    /* */
+                    this.user = this.users.get(id);
+                },
+                getUserId: function(ev) {
+                    /* */
+                    return $(ev.currentTarget).data('id');
+                },
+                newUser: function(ev) {
+                    var that = this;
+                    var obj = $(ev.currentTarget).closest('form').serializeObject();
+
+                    obj.name = obj.new_name;
+                    obj.value = obj.new_value;
+                    delete obj.new_name;
+                    delete obj.new_value;
+
+                    this.user.save(obj, {
+                        success: function () {
+                            that.users.add(that.user);
+                        }
+                    });
+                    return false;
+                },
+                saveUser: function(ev) {
+                    /* */
+                    var that = this;
+                    var obj = $(ev.currentTarget).closest('form').serializeObject();
+                    obj.name = obj.edit_name;
+                    obj.value = obj.edit_value;
+                    delete obj.new_name;
+                    delete obj.new_value;
+                    delete obj.edit_name;
+                    delete obj.edit_value;
+                    this.user.save(obj, {
+                        success: function () {
+                            that.users.add(that.user);
+                            that.renderOnly(null);
+                        }
+                    });
+                    return false;
+                },
+                editUser: function(ev) {
+                    /* Instruct render to show edit "subview" for user of `id`. */ 
+                    var id = this.getUserId(ev);
+                    this.selectUser(id);
+                    this.renderOnly(id);                    
+                },
+                deleteUser: function(ev) {
+                    /* Instructs removal of user of `id`. */
+                    var id = this.getUserId(ev);
+                    this.selectUser(id);
+                    this.user.destroy();                    
                 }
             });
 
@@ -37,14 +157,16 @@
                 }
             });
 
-            var userlist = new UserList();
             var router = new Router();
+            var users = new Users();
+            var user = new User();
+            var userList = new UserList(users, user);
 
             router.on('route:home', function() {
-                userlist.render();
+                userList.render();
             });
 
             Backbone.history.start();
         </script>
     </body>
-</html>
+</html> 

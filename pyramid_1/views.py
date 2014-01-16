@@ -74,15 +74,15 @@ def user_get(context, request):
 def user_put(request):
     """Update an existing user with `id`"""
 
-    user = request.user
     name = request.validated_params['name']
     value = request.validated_params['value']
     
+    user = request.user
     user.name = name
     user.value = value
 
     DBSession.add(user)
-    DBCommit()
+    DBSession.flush()
     return userdict(user)
 
 

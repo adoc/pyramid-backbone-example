@@ -1,3 +1,6 @@
+import logging
+log = logging.getLogger(__name__)
+
 import pyramid.httpexceptions as exc
 
 from formencode import validators, Schema, Invalid
@@ -21,14 +24,17 @@ def validate(params=None, match=None):
         def _inner(context, request):
             def validate_params(this):
                 try:
-                    return params.to_python(request.params)
+                    data = request.json_body or request.params
+                    return params.to_python(data)
                 except Invalid:
+                    log.error("`validate` failed on request.params %s." % data)
                     raise exc.HTTPBadRequest()
 
             def validate_match(this):
                 try:
                     return match.to_python(request.matchdict)
                 except Invalid:
+                    log.error("`validate` failed on request.matchdict %s." % request.matchdict)
                     raise exc.HTTPNotFound()
 
             if params:
@@ -45,10 +51,11 @@ def validate(params=None, match=None):
 class UserSchema(Schema):
     """Simple schema for models.MyModel.
     """
-    allow_extra_fields = False
+    allow_extra_fields = True
+    filter_extra_fields = True
 
-    name = validators.UnicodeString(max=128)
-    value = validators.Int()
+    name = validators.UnicodeString(not_empty=True, max=128)
+    value = validators.Int(not_empty=True)
 
 
 class UserGetSchema(Schema):
@@ -56,4 +63,4 @@ class UserGetSchema(Schema):
     """
     allow_extra_fields = False
 
-    id = validators.Int()
+    id = validators.Int(not_empty=True)
