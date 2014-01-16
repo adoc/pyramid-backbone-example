@@ -17,6 +17,7 @@ requires = [
     'transaction',
     'zope.sqlalchemy',
     'waitress',
+    'formencode'
     ]
 
 setup(name='pyramid_1',

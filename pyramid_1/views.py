@@ -8,6 +8,8 @@ from sqlalchemy.exc import DBAPIError
 
 from .models import DBSession, MyModel
 
+from .validators import validate, MyModelSchema, UserMatchSchema
+
 
 def DBCommit():
     try:
@@ -19,6 +21,7 @@ def DBCommit():
         return True
 
 
+
 @view_config(route_name='users', request_method='GET', renderer='json')
 def users_get(request):
     """Query and return a list of users."""
@@ -28,7 +31,8 @@ def users_get(request):
                 users]
 
 
-@view_config(route_name='users', request_method='POST', renderer='json')
+@view_config(decorator=validate(params=MyModelSchema), route_name='users',
+                request_method='POST', renderer='json')
 def users_post(request):
     """Create a new user."""
 
@@ -39,20 +43,22 @@ def users_post(request):
     return True
 
 
-@view_config(route_name='user', request_method='GET', renderer='json')
-def user_get(request):
+@view_config(decorator=validate(match=UserMatchSchema), route_name='user',
+                request_method='GET', renderer='json')
+def user_get(context, request):
     """Get a specific user by `id`."""
 
-    id_ = int(request.matchdict['id'])
+    id_ = request.matchdict['id']
     user = DBSession.query(MyModel).get(id_)
     return {'id': user.id, 'name': user.name, 'value': user.value}
 
 
-@view_config(route_name='user', request_method='PUT', renderer='json')
+@view_config(decorator=validate(params=MyModelSchema, match=UserMatchSchema),
+                route_name='user', request_method='PUT', renderer='json')
 def user_put(request):
     """Update an existing user with `id`"""
 
-    id_ = int(request.matchdict['id'])
+    id_ = request.matchdict['id']
     name = request.params['name']
     value = request.params['value']
     user = DBSession.query(MyModel).get(id_)
@@ -63,11 +69,12 @@ def user_put(request):
     return True
 
 
-@view_config(route_name='user', request_method='DELETE', renderer='json')
+@view_config(decorator=validate(match=UserMatchSchema), route_name='user',
+                request_method='DELETE', renderer='json')
 def user_delete(request):
     """Delete a user with `id`."""
 
-    id_ = int(request.matchdict['id'])
+    id_ = request.matchdict['id']
     user = DBSession.query(MyModel).get(id_)
     DBSession.delete(user)
     DBCommit()
