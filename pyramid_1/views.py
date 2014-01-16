@@ -6,7 +6,6 @@ from sqlalchemy.exc import DBAPIError
 
 from .models import DBSession, DBCommit, User
 from .validators import validate, UserSchema, UserGetSchema
-from .agents import user_get
 from .util import chained
 
 
