@@ -2,6 +2,8 @@ import pyramid.httpexceptions as exc
 
 from formencode import validators, Schema, Invalid
 
+from .models import DBSession, MyModel
+
 
 def validate(params=None, match=None):
     """Basic validation decorator for usage in `view_config`.
@@ -37,8 +39,7 @@ def validate(params=None, match=None):
 class MyModelSchema(Schema):
     """Simple schema for models.MyModel.
     """
-    allow_extra_fields = True
-    filter_extra_fields = True
+    allow_extra_fields = False
 
     name = validators.UnicodeString(max=128)
     value = validators.Int()
@@ -50,3 +51,15 @@ class UserMatchSchema(Schema):
     allow_extra_fields = False
 
     id = validators.Int()
+
+    def _to_python(self, value_dict, state):
+        """Get the model record and return it to request.params as `user`
+        """
+        value_dict = Schema._to_python(self, value_dict, state)
+        id_ = value_dict['id']
+        user = DBSession.query(MyModel).get(id_)
+        if user:
+            value_dict['user'] = user
+            return value_dict
+        else:
+            raise Invalid('No record found.', value_dict, state)

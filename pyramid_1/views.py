@@ -21,14 +21,16 @@ def DBCommit():
         return True
 
 
+def userdict(user):
+    return {'id': user.id, 'name': user.name, 'value': user.value}
+
 
 @view_config(route_name='users', request_method='GET', renderer='json')
 def users_get(request):
     """Query and return a list of users."""
 
     users = DBSession.query(MyModel).all()
-    return [{'id': user.id, 'name': user.name, 'value': user.value} for user in
-                users]
+    return [userdict(user) for user in users]
 
 
 @view_config(decorator=validate(params=MyModelSchema), route_name='users',
@@ -37,10 +39,12 @@ def users_post(request):
     """Create a new user."""
 
     name = request.params['name']    
-    value = int(request.params['value'])
+    value = request.params['value']
     user = MyModel(name=name, value=value)
+    
     DBSession.add(user)
-    return True
+    DBCommit()
+    return userdict(user)
 
 
 @view_config(decorator=validate(match=UserMatchSchema), route_name='user',
@@ -48,9 +52,8 @@ def users_post(request):
 def user_get(context, request):
     """Get a specific user by `id`."""
 
-    id_ = request.matchdict['id']
-    user = DBSession.query(MyModel).get(id_)
-    return {'id': user.id, 'name': user.name, 'value': user.value}
+    user = request.matchdict['user']
+    return userdict(user)
 
 
 @view_config(decorator=validate(params=MyModelSchema, match=UserMatchSchema),
@@ -58,15 +61,16 @@ def user_get(context, request):
 def user_put(request):
     """Update an existing user with `id`"""
 
-    id_ = request.matchdict['id']
+    user = request.matchdict['user']
     name = request.params['name']
     value = request.params['value']
-    user = DBSession.query(MyModel).get(id_)
+    
     user.name = name
     user.value = value
+
     DBSession.add(user)
     DBCommit()
-    return True
+    return userdict(user)
 
 
 @view_config(decorator=validate(match=UserMatchSchema), route_name='user',
@@ -74,8 +78,7 @@ def user_put(request):
 def user_delete(request):
     """Delete a user with `id`."""
 
-    id_ = request.matchdict['id']
-    user = DBSession.query(MyModel).get(id_)
+    user = request.matchdict['user']
     DBSession.delete(user)
     DBCommit()
     return True
