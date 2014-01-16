@@ -1,5 +1,3 @@
-//Filename: boilerplate.js
-
 define([
     'jquery',
     'underscore',
