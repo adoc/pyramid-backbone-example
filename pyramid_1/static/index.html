@@ -4,13 +4,51 @@
         <!-- Inspired by http://backbonetutorials.com/videos/beginner/ /-->
         <title>Backbone/Pyramid - A Gradual Journey</title>
         <link href="//netdna.bootstrapcdn.com/bootstrap/3.0.3/css/bootstrap.min.css" rel="stylesheet">
+        <style>
+            /* Thanks http://getbootstrap.com/2.3.2/examples/sticky-footer-navbar.html */
+            html,
+            body {
+                height: 100%;
+            }
+
+            #wrap {
+                min-height: 100%;
+                height: auto !important;
+                height: 100%;
+                margin: 0 auto -100px;
+            }
+
+            #push, #footer {
+                height: 100px;
+            }
+
+            #wrap > .container {
+                padding-top: 60px;
+            }
+
+        </style>
     </head>
     <body>
-        <div class="container">
-            <h1>Backbone/Pyramid</h1>
-            <h2>Users</h2>
-            <hr />
-            <div class="page"></div>
+        <div id="wrap">
+            <div class="container">
+                <h1>Backbone/Pyramid</h1>
+                <h2>Users</h2>
+                <hr />
+                <div class="page"></div>
+            </div>
+            <div id="push"></div>
+        </div>
+        <div id="footer">
+            <div class="container">
+                <p class="pull-left"><strong>A simple project to learn Pyramid and Backbone.js.</strong></p>
+                <div class="clearfix"></div>
+                <p class="pull-left">by: <a href="https://github.com/adoc/">Nick Long</a></p>
+                <div class="clearfix"></div>
+                <p class="pull-left">Inspired by <a href="http://backbonetutorials.com/videos/beginner/">Backbone Tutorials</a></p>
+                <div class="pull-right">
+                    <a rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/"><img alt="Creative Commons License" style="border-width:0" src="http://i.creativecommons.org/l/by-sa/4.0/88x31.png" /></a>
+                </div>
+            </div>
         </div>
         <script type="text/template" id="tmpl_user_list">
             <form id="users_form">
@@ -19,27 +57,48 @@
                     <tr>
                         <th>Name</th>
                         <th>Awesomeness<br />Rating</th>
-                        <th><em>Do</em></th>
+                        <th></th>
                     </tr>
                 </thead>
                 <tbody>
                     <tr>
-                        <td><input type="text" name="new_name" size="32" maxlength="32" /></td>
-                        <td><input type="text" name="new_value" size="3" maxlength="3" /></td>
-                        <td><button type="button" name="new" class="btn">New User</button></td>
+                        <td class="form-group">
+                            <input class="form-control" type="text" name="new_name" size="32" maxlength="32" />
+                            <label class="control-label"></label>
+                        </td>
+                        <td class="form-group">
+                            <input class="form-control" type="text" name="new_value" size="3" maxlength="3" />
+                            <label class="control-label"></label>
+                        </td>
+                        <td class="form-group"><button type="button" name="new" class="btn">New User</button></td>
                     </tr>
                   <% _.each(users, function(user) { %>
                     <tr>
                       <% if (edit && user.get('id') == edit) { %>
-                        <td><input type="text" name="edit_name" value="<%=user.get('name')%>" size="32" maxlength="32" /></td>
-                        <td><input type="text" name="edit_value" value="<%=user.get('value')%>" size="3" maxlength="3" /></td>
-                        <td><button type="button" name="save" class="btn" data-id="<%=user.get('id')%>">Save</button></td>
+                        <td class="form-group">
+                            <input class="form-control" type="text" name="edit_name" value="<%=user.get('name')%>" size="32" maxlength="32" />
+                            <label class="control-label"></label>
+                        </td>
+                        <td class="form-group">
+                            <input class="form-control" type="text" name="edit_value" value="<%=user.get('value')%>" size="3" maxlength="3" />
+                            <label class="control-label"></label>
+                        </td>
+                        <td class="form-group">
+                            <button type="button" name="save" class="btn btn-primary" data-id="<%=user.get('id')%>">Save</button>
+                            <button type="button" name="cancel" class="btn btn-warning" data-id="<%=user.get('id')%>">Cancel</button>
+                        </td>
                       <% } else { %>
-                        <td><%=user.get('name')%></td>
-                        <td><%=user.get('value')%></td>
-                        <td>
-                            <button type="button" name="edit" class="btn" data-id="<%=user.get('id')%>">Edit</button>
-                            <button type="button" name="delete" class="btn" data-id="<%=user.get('id')%>">Delete</button>
+                        <td class="form-group">
+                            <input disabled="disabled" class="form-control" type="text" value="<%=user.get('name')%>" />
+                            <label class="control-label"></label>
+                        </td>
+                        <td class="form-group">
+                            <input disabled="disabled" class="form-control" type="text" value="<%=user.get('value')%>" />
+                            <label class="control-label"></label>
+                        </td>
+                        <td class="form-group">
+                            <button type="button" name="edit" class="btn btn-primary" data-id="<%=user.get('id')%>">Edit</button>
+                            <button type="button" name="delete" class="btn btn-warning" data-id="<%=user.get('id')%>">Delete</button>
                         </td>
                       <% } %>     
                     </tr>
@@ -52,15 +111,53 @@
         <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
         <script src="//cdnjs.cloudflare.com/ajax/libs/underscore.js/1.5.2/underscore-min.js"></script>
         <script src="//cdnjs.cloudflare.com/ajax/libs/backbone.js/1.1.0/backbone-min.js"></script>
+        <script src="//cdnjs.cloudflare.com/ajax/libs/require.js/2.1.10/require.min.js"></script>
         <script src="//cdnjs.cloudflare.com/ajax/libs/jquery-serialize-object/2.0.0/jquery.serialize-object.compiled.js"></script>
         <script>
-            var Users = Backbone.Collection.extend({
-                url: '/users'
-            });
+        /*
+            require.config({
+              paths: {
+                jquery: 'libs/jquery/jquery',
+                underscore: 'libs/underscore/underscore',
+                backbone: 'libs/backbone/backbone'
+              }
+
+            }); */
 
             var User = Backbone.Model.extend({
-                urlRoot: '/users'
+                urlRoot: '/users',
+                validate: function(attrs, options) {
+                    /* Just some simple validation for a better UX */
+                    validation_errors = [];
+                    if (attrs.name.length <= 0) {
+                        validation_errors.push({"field": "name",
+                                                "msg": "Must give a value"});
+                    }
+                    if (attrs.name.length >= 128) {
+                        validation_errors.push({"field": "name",
+                                                "msg": "Name must be less than 128 characters."});
+                    }
+                    if (!parseInt(attrs.value)) {
+                        validation_errors.push({"field": "value",
+                                                "msg": "Value must be a number"});
+                    }
+                    if (validation_errors.length > 0) {
+                        return validation_errors;
+                    }
+                },
+                set: function(attributes, options) {
+                    /* Cast integer attributes for correct attribute hashing, validation, etc. */
+                    attributes.value = parseInt(attributes.value);
+                    return Backbone.Model.prototype.set.call(this, attributes, options);
+                }
             });
+
+
+            var Users = Backbone.Collection.extend({
+                url: '/users',
+                model: User
+            });
+
 
             var UserList = Backbone.View.extend({
                 el: '.page',
@@ -68,15 +165,15 @@
                     'click button[name="new"]': 'newUser',
                     'click button[name="save"]': 'saveUser',
                     'click button[name="edit"]': 'editUser',
-                    'click button[name="delete"]': 'deleteUser'
+                    'click button[name="delete"]': 'deleteUser',
+                    'click button[name="cancel"]': 'renderOnly'
                 },
-                initialize: function(users, user) {
+                initialize: function() {
                     /* Init the UserList view */
-                    this.users = users;
-                    this.user = user;
-                    this.user.on('change', this.renderOnly, this);
+                    this.users = new Users();
                     this.users.on('add', this.renderOnly, this);
                     this.users.on('remove', this.renderOnly, this);
+                    this.invalid = false;
                 },
                 renderOnly: function(edit) {
                     /* Render the data/template only. */
@@ -85,70 +182,133 @@
                             edit: edit
                         });
                     this.$el.html(template);
+                    this.delete_state = null;
+                    this.invalid = false;
                 },
                 render: function() {
                     /* Fetch data model and render template. */
                     var that = this;
-                    that.users.fetch({
+                    this.users.fetch({
                         success: function() {
                             that.renderOnly();
                         }
                     });
                 },
-                selectUser: function(id) {
-                    /* */
-                    this.user = this.users.get(id);
+                invalidView: function(form, prefix) {
+                    /* Update view with errors/warnings for form validation. */
+                    var that = this;
+                    function inner(model, errors) {
+                        /* validation error handler for this view. */
+                        that.invalid = true;
+
+                        $.each($('.form-group.has-error', form), function(i, clearme) {
+                            // Clear any errors in the form.
+                            $(clearme).removeClass('has-error');
+                            $(clearme).children('label').html('');
+                        });
+
+                        for (i in errors) {
+                            var error = errors[i];
+                            var field = error['field'];
+                            var msg = error['msg'];
+                            var el = form.find('input[name="' + prefix + '_' + field + '"]'); // TODO: Ugly. Use string replacement, templating, etc.
+                            var par = el.parent('.form-group');
+                            par.addClass('has-error');
+                            par.children('label').html(msg);
+                        }
+                    }
+                    return inner;
                 },
                 getUserId: function(ev) {
                     /* */
                     return $(ev.currentTarget).data('id');
                 },
                 newUser: function(ev) {
+                    /* New user intent. Serialize and save. 
+                    */
                     var that = this;
-                    var obj = $(ev.currentTarget).closest('form').serializeObject();
-
-                    obj.name = obj.new_name;
-                    obj.value = obj.new_value;
-                    delete obj.new_name;
-                    delete obj.new_value;
-
-                    this.user.save(obj, {
+                    var form = $(ev.currentTarget).closest('form');
+                    var obj = form.serializeObject();
+                    var userDetails = {name: obj.new_name, value:obj.new_value};
+                    user = new User();
+                    user.on("invalid", this.invalidView(form, 'new'));
+                    user.save(userDetails, {
                         success: function () {
-                            that.users.add(that.user);
+                            that.users.add(user);
+                        },
+                        error: function(xhr, textStatus) {
+                            if(textStatus.status==400) {
+                                throw("newUser: Server said request was bad.");
+                            } else {
+                                throw("newUser: Server Error.");
+                            }
                         }
                     });
-                    return false;
                 },
                 saveUser: function(ev) {
-                    /* */
+                    /* 
+                    TODO: Refactor this and newUser. Similar code.
+                    */
                     var that = this;
-                    var obj = $(ev.currentTarget).closest('form').serializeObject();
-                    obj.name = obj.edit_name;
-                    obj.value = obj.edit_value;
-                    delete obj.new_name;
-                    delete obj.new_value;
-                    delete obj.edit_name;
-                    delete obj.edit_value;
-                    this.user.save(obj, {
-                        success: function () {
-                            that.users.add(that.user);
-                            that.renderOnly(null);
-                        }
-                    });
-                    return false;
+                    var form = $(ev.currentTarget).closest('form');
+                    var obj = form.serializeObject();
+                    var userDetails = {name: obj.edit_name, value:obj.edit_value};
+                    var id = this.getUserId(ev);
+                    var user = this.users.get(id);
+
+                    user.on("invalid", this.invalidView(form, 'edit'));
+                    user.set(userDetails, {validate: true});
+                    
+                    console.log(this.invalid);
+
+                    if (user.hasChanged()) { // Does .save really not check to see if the model has changed?
+                        user.save(userDetails, {
+                            success: function () {
+                                that.renderOnly(null);
+                            },
+                            error: function(data) {
+                                throw "saveUser: Server Error.";
+                            }
+                        });
+                    } else if (!this.invalid) {
+                        that.renderOnly(null);
+                    }
                 },
                 editUser: function(ev) {
                     /* Instruct render to show edit "subview" for user of `id`. */ 
                     var id = this.getUserId(ev);
-                    this.selectUser(id);
                     this.renderOnly(id);                    
                 },
                 deleteUser: function(ev) {
                     /* Instructs removal of user of `id`. */
-                    var id = this.getUserId(ev);
-                    this.selectUser(id);
-                    this.user.destroy();                    
-                }
+                    var el = ev.currentTarget;
+                    if (this.delete_state && this.delete_state == el) {
+                        var id = this.getUserId(ev);
+                        var user = this.users.get(id);
+                        user.destroy();
+                        this.deleteCancel(ev);
+                    } else if (this.delete_state && this.delete_state != el) {
+                        this.deleteCancel(this.delete_state);
+                        this.deleteReady(ev);
+                    } else {
+                        this.deleteReady(ev);
+                    }
+                },
+                deleteReady: function(ev) {
+                    /* Ready the delete. Start the timer. */
+                    var that = this;
+                    var el = ev.currentTarget;
+                    this.delete_state = el;
+                    clearInterval(this.deleteTimer);
+                    this.deleteTimer = setInterval(function() {that.deleteCancel(ev);}, 3000);
+                    $(ev.currentTarget).addClass('btn-danger');
+                },
+                deleteCancel: function(ev) {
+                    /* Cancel the delete and timer. */ 
+                    $(ev.currentTarget).removeClass('btn-danger');
+                    this.delete_state = null;
+                    clearInterval(this.deleteTimer);
+                },
             });
 
             var Router = Backbone.Router.extend({
@@ -158,9 +318,7 @@
             });
 
             var router = new Router();
-            var users = new Users();
-            var user = new User();
-            var userList = new UserList(users, user);
+            var userList = new UserList();
 
             router.on('route:home', function() {
                 userList.render();
