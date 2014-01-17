@@ -26,8 +26,8 @@ def validate(params=None, match=None):
                 try:
                     data = request.json_body or request.params
                     return params.to_python(data)
-                except Invalid:
-                    log.error("`validate` failed on request.params %s." % data)
+                except Invalid as e:
+                    log.error("`validate` failed on request.params %s. Error: %s" % (data, e.msg))
                     raise exc.HTTPBadRequest()
 
             def validate_match(this):

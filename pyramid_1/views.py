@@ -4,6 +4,7 @@ import pyramid.httpexceptions as exc
 
 from sqlalchemy.exc import DBAPIError
 
+from .auth import authenticate
 from .models import DBSession, DBCommit, User
 from .validators import validate, UserSchema, UserGetSchema
 from .util import chained
@@ -16,7 +17,6 @@ def get_user(view_callable):
     # I'm sure there's a better way to hook this request property.
     def _inner(context, request):
         def query(this):
-            print(this)
             id_ = request.validated_matchdict['id']
             user = DBSession.query(User).get(id_)
             if user:
@@ -36,7 +36,7 @@ def userdict(user):
 # Views
 # =====
 
-@view_config(route_name='users', request_method='GET', renderer='json')
+@view_config(decorator=authenticate(as_list=True), route_name='users', request_method='GET', renderer='json')
 def users_get(request):
     """Query and return a list of users."""
 
@@ -44,7 +44,7 @@ def users_get(request):
     return [userdict(user) for user in users]
 
 
-@view_config(decorator=validate(params=UserSchema), route_name='users',
+@view_config(decorator=chained(authenticate(), validate(params=UserSchema)), route_name='users',
                 request_method='POST', renderer='json')
 def users_post(request):
     """Create a new user."""
@@ -58,7 +58,7 @@ def users_post(request):
     return userdict(user)
 
 
-@view_config(decorator=chained(validate(match=UserGetSchema), get_user),
+@view_config(decorator=chained(authenticate(), validate(match=UserGetSchema), get_user),
                 route_name='user', request_method='GET', renderer='json')
 def user_get(context, request):
     """Get a specific user by `id`."""
@@ -68,6 +68,7 @@ def user_get(context, request):
 
 
 @view_config(decorator=chained(
+                        authenticate(),
                         validate(params=UserSchema, match=UserGetSchema),
                         get_user),
                 route_name='user', request_method='PUT', renderer='json')
@@ -86,7 +87,7 @@ def user_put(request):
     return userdict(user)
 
 
-@view_config(decorator=chained(validate(match=UserGetSchema), get_user),                
+@view_config(decorator=chained(authenticate(), validate(match=UserGetSchema), get_user),                
                 route_name='user', request_method='DELETE', renderer='json')
 def user_delete(request):
     """Delete a user with `id`."""

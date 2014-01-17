@@ -1,9 +1,5 @@
-define([
-    'jquery',
-    'underscore',
-    'backbone',
-    'routes'],
-    function($, _, Backbone, Routes){
+define(['jquery', 'underscore', 'backbone', 'routes', 'jquery_serialize_object'],
+    function($, _, Backbone, Routes) {
         var initialize = function(){
             Routes.initialize();
         }

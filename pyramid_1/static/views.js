@@ -3,10 +3,12 @@ define([
     'underscore',
     'backbone',
     'models_collections',
+    'api_auth',
     'text!users_list.tmpl.html',
     'jquery_serialize_object',
     ],
-    function($, _, Backbone, Models, users_list_tmpl) {
+    function($, _, Backbone, Models, crypto, users_list_tmpl) {
+        
         var Users = Models.Users
         var User = Models.User
         var UserList = Backbone.View.extend({
@@ -108,9 +110,6 @@ define([
 
                 user.on("invalid", this.invalidView(form, 'edit'));
                 user.set(userDetails, {validate: true});
-                
-                console.log(this.invalid);
-
                 if (user.hasChanged()) { // Does .save really not check to see if the model has changed?
                     user.save(userDetails, {
                         success: function () {

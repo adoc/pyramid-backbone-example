@@ -25,7 +25,7 @@ define(['backbone'],
                 /* Cast integer attributes for correct attribute hashing, validation, etc. */
                 attributes.value = parseInt(attributes.value);
                 return Backbone.Model.prototype.set.call(this, attributes, options);
-            }
+            },
         });
 
         var Users = Backbone.Collection.extend({

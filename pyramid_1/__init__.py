@@ -4,7 +4,7 @@ from pyramid.session import UnencryptedCookieSessionFactoryConfig as SessionFact
 from sqlalchemy import engine_from_config
 
 from .models import DBSession, Base
-
+from .auth import AuthJsonRenderer
 
 def main(global_config, **settings):
     """ This function returns a Pyramid WSGI application.
@@ -22,6 +22,7 @@ def main(global_config, **settings):
                     session_factory=SessionFactory('pyramid_backbone_simple'))
     config.include('pyramid_chameleon')
     
+    config.add_renderer('json', AuthJsonRenderer())
 
     # Routes
     # ======
