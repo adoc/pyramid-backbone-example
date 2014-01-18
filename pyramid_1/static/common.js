@@ -27,7 +27,9 @@ require.config({
         crypto_b64: [
             '//crypto-js.googlecode.com/svn/tags/3.1.2/build/components/enc-base64',
             '/lib/crypto-enc-base64'],
-        rest_auth: '/lib/rest-auth/rest_auth'
+        auth: '/lib/backbone-rest-auth/auth',
+        rest_auth: '/lib/rest-auth/rest-auth',
+        cookie: '/lib/cookie'
     },
     shim: {
         backbone: {

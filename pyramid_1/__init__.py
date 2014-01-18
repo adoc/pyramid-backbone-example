@@ -5,7 +5,7 @@ from pyramid.events import NewRequest, NewResponse
 from sqlalchemy import engine_from_config
 
 from .models import DBSession, Base
-from restauth import PyramidAuthApiServer
+import restauth
 
 
 def main(global_config, **settings):
@@ -28,13 +28,18 @@ def main(global_config, **settings):
     # ==================
     # Note: Can I put this elsewhere? This is a little Pylons-ish
     #   (except the config isn't global.)
-    config.add_settings({'auth_api': PyramidAuthApiServer('server1',
-                                             remotes={'client1': '12345'},
-                                             passes=10)})
+    config.add_settings({'auth_api': restauth.PyramidAuthApiServer(
+                                            'server1',
+                                            remotes={'client1': '12345'},
+                                            passes=10)})
+    
+    config.add_view(restauth.ping_view(), route_name='ping',
+                    request_method='GET', renderer='json')
 
     # Routes
     # ======
     # Users RESTful API
+    config.add_route('ping', '/ping')
     config.add_route('users', '/users')
     config.add_route('user', '/users/{id}')
 
@@ -44,4 +49,7 @@ def main(global_config, **settings):
 
 
     config.scan()
+
+
+
     return config.make_wsgi_app()

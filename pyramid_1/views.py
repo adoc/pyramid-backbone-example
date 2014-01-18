@@ -2,11 +2,12 @@ from pyramid.response import Response
 from pyramid.view import view_config
 import pyramid.httpexceptions as exc
 
+from sqlalchemy.sql.expression import desc
+
 from restauth import auth_view_config
 from .models import DBSession, DBCommit, User
 from .validators import validate, UserSchema, UserGetSchema
 from .util import chained
-
 
 
 # View Utilities
@@ -33,16 +34,16 @@ def userdict(user):
 
 # Views
 # =====
-@auth_view_config(list, route_name='users', request_method='GET', renderer='json')
+@auth_view_config(list, tight_auth=True, route_name='users',
+                    request_method='GET', renderer='json')
 def users_get(request):
     """Query and return a list of users."""
-    users = DBSession.query(User).all()
+    users = DBSession.query(User).order_by(desc(User.id)).all()
     return [userdict(user) for user in users]
 
 
-
-@auth_view_config(dict, decorator=chained(validate(params=UserSchema)), route_name='users',
-                request_method='POST', renderer='json')
+@auth_view_config(dict, tight_auth=True, decorator=validate(params=UserSchema),
+                    route_name='users', request_method='POST', renderer='json')
 def users_post(request):
     """Create a new user."""
 
@@ -55,7 +56,9 @@ def users_post(request):
     return userdict(user)
 
 
-@auth_view_config(dict, decorator=chained(validate(match=UserGetSchema), get_user),
+@auth_view_config(dict, tight_auth=True, decorator=chained(
+                                    validate(match=UserGetSchema),
+                                    get_user),
                 route_name='user', request_method='GET', renderer='json')
 def user_get(context, request):
     """Get a specific user by `id`."""
@@ -64,9 +67,9 @@ def user_get(context, request):
     return userdict(user)
 
 
-@auth_view_config(dict, decorator=chained(
-                        validate(params=UserSchema, match=UserGetSchema),
-                        get_user),
+@auth_view_config(dict, tight_auth=True, decorator=chained(
+                            validate(params=UserSchema, match=UserGetSchema),
+                            get_user),
                 route_name='user', request_method='PUT', renderer='json')
 def user_put(request):
     """Update an existing user with `id`"""
@@ -83,8 +86,9 @@ def user_put(request):
     return userdict(user)
 
 
-@auth_view_config(dict, decorator=
-                            chained(validate(match=UserGetSchema), get_user),                
+@auth_view_config(dict, tight_auth=True, decorator=chained(
+                                validate(match=UserGetSchema),
+                                get_user),
                 route_name='user', request_method='DELETE', renderer='json')
 def user_delete(request):
     """Delete a user with `id`."""
