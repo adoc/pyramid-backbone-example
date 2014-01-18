@@ -2,17 +2,15 @@ from pyramid.response import Response
 from pyramid.view import view_config
 import pyramid.httpexceptions as exc
 
-from sqlalchemy.exc import DBAPIError
-
-from .auth import authenticate
+from .auth import auth_view_config
 from .models import DBSession, DBCommit, User
 from .validators import validate, UserSchema, UserGetSchema
 from .util import chained
 
 
+
 # View Utilities
 # ==============
-
 def get_user(view_callable):
     # I'm sure there's a better way to hook this request property.
     def _inner(context, request):
@@ -35,16 +33,15 @@ def userdict(user):
 
 # Views
 # =====
-
-@view_config(decorator=authenticate(as_list=True), route_name='users', request_method='GET', renderer='json')
+@auth_view_config(list, route_name='users', request_method='GET', renderer='json')
 def users_get(request):
     """Query and return a list of users."""
-
     users = DBSession.query(User).all()
     return [userdict(user) for user in users]
 
 
-@view_config(decorator=chained(authenticate(), validate(params=UserSchema)), route_name='users',
+
+@auth_view_config(dict, decorator=chained(validate(params=UserSchema)), route_name='users',
                 request_method='POST', renderer='json')
 def users_post(request):
     """Create a new user."""
@@ -58,7 +55,7 @@ def users_post(request):
     return userdict(user)
 
 
-@view_config(decorator=chained(authenticate(), validate(match=UserGetSchema), get_user),
+@auth_view_config(dict, decorator=chained(validate(match=UserGetSchema), get_user),
                 route_name='user', request_method='GET', renderer='json')
 def user_get(context, request):
     """Get a specific user by `id`."""
@@ -67,8 +64,7 @@ def user_get(context, request):
     return userdict(user)
 
 
-@view_config(decorator=chained(
-                        authenticate(),
+@auth_view_config(dict, decorator=chained(
                         validate(params=UserSchema, match=UserGetSchema),
                         get_user),
                 route_name='user', request_method='PUT', renderer='json')
@@ -87,7 +83,8 @@ def user_put(request):
     return userdict(user)
 
 
-@view_config(decorator=chained(authenticate(), validate(match=UserGetSchema), get_user),                
+@auth_view_config(dict, decorator=
+                            chained(validate(match=UserGetSchema), get_user),                
                 route_name='user', request_method='DELETE', renderer='json')
 def user_delete(request):
     """Delete a user with `id`."""

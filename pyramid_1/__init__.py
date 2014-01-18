@@ -1,10 +1,12 @@
 from pyramid.config import Configurator
 from pyramid.session import UnencryptedCookieSessionFactoryConfig as SessionFactory
+from pyramid.events import NewRequest, NewResponse
 
 from sqlalchemy import engine_from_config
 
 from .models import DBSession, Base
-from .auth import AuthJsonRenderer
+from .auth import AuthApi
+
 
 def main(global_config, **settings):
     """ This function returns a Pyramid WSGI application.
@@ -22,7 +24,12 @@ def main(global_config, **settings):
                     session_factory=SessionFactory('pyramid_backbone_simple'))
     config.include('pyramid_chameleon')
     
-    config.add_renderer('json', AuthJsonRenderer())
+    # Authentication API
+    # ==================
+    # Note: Can I put this elsewhere? This is a little Pylons-ish
+    #   (except the config isn't global.)
+    config.add_settings({'auth_api': AuthApi({"01918182783": "12345"},
+                            passes=10)}) 
 
     # Routes
     # ======

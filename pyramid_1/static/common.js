@@ -26,7 +26,8 @@ require.config({
             '/js/crypto-hmac'],
         crypto_b64: [
             '//crypto-js.googlecode.com/svn/tags/3.1.2/build/components/enc-base64',
-            '/js/crypto-enc-base64']
+            '/js/crypto-enc-base64'],
+        pyramid_auth: '/lib/pyramid_auth'
     },
     shim: {
         backbone: {
@@ -35,6 +36,9 @@ require.config({
         },
         underscore: {
             exports: '_'
+        },
+        jquery_serialize_object: {
+            deps: ['jquery']
         },
         crypto_sha: {
             deps: ['crypto_core']
@@ -45,8 +49,8 @@ require.config({
         crypto_b64: {
             deps: ['crypto_core']
         },
-        jquery_serialize_object: {
-            deps: ['jquery']
+        pyramid_auth: {
+            deps: ['crypto_sha', 'crypto_hmac']
         }
     },
     timeout: 1

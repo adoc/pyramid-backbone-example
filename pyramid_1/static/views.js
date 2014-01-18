@@ -3,11 +3,10 @@ define([
     'underscore',
     'backbone',
     'models_collections',
-    'api_auth',
     'text!users_list.tmpl.html',
     'jquery_serialize_object',
     ],
-    function($, _, Backbone, Models, crypto, users_list_tmpl) {
+    function($, _, Backbone, Models, users_list_tmpl) {
         
         var Users = Models.Users
         var User = Models.User
