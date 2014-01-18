@@ -5,7 +5,7 @@ from pyramid.events import NewRequest, NewResponse
 from sqlalchemy import engine_from_config
 
 from .models import DBSession, Base
-from .auth import AuthApi
+from restauth import PyramidAuthApiServer
 
 
 def main(global_config, **settings):
@@ -28,8 +28,9 @@ def main(global_config, **settings):
     # ==================
     # Note: Can I put this elsewhere? This is a little Pylons-ish
     #   (except the config isn't global.)
-    config.add_settings({'auth_api': AuthApi({"01918182783": "12345"},
-                            passes=10)}) 
+    config.add_settings({'auth_api': PyramidAuthApiServer('server1',
+                                             remotes={'client1': '12345'},
+                                             passes=10)})
 
     # Routes
     # ======

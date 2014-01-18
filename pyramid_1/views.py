@@ -2,7 +2,7 @@ from pyramid.response import Response
 from pyramid.view import view_config
 import pyramid.httpexceptions as exc
 
-from .auth import auth_view_config
+from restauth import auth_view_config
 from .models import DBSession, DBCommit, User
 from .validators import validate, UserSchema, UserGetSchema
 from .util import chained

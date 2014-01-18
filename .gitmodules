@@ -1,3 +1,9 @@
 [submodule "pyramid_1/static/lib/rest-auth"]
 	path = pyramid_1/static/lib/rest-auth
 	url = https://github.com/adoc/js-rest-auth
+[submodule "rest_auth"]
+	path = rest_auth
+	url = https://github.com/adoc/py-rest-auth
+[submodule "restauth"]
+	path = restauth
+	url = https://github.com/adoc/py-rest-auth

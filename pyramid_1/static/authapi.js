@@ -1,37 +1,32 @@
-define(['jquery', 'underscore', 'backbone', 'pyramid_auth'],
-    function($, _, Backbone, PyramidAuth) {
-        /* Provides bi-directional HMAC.
-        Hooks in to Backbone.Model.sync and Backbone.Collection.sync rather simply.
-        */
+define(['backbone', 'rest_auth'],
+    
+    // Provides bi-directional HMAC hooked in to Model and Collection.
+    function(Backbone, RestAuth) {
 
-        //Temporary
-        var api_secret = "12345";
-        var client_id = "01918182783";
-        var hash_passes = 10;
+        // Extend RestAuth with our settings.
+        // These credentials should be found and injected elsewhere. (cookie, etc.)
+        var AuthApi = RestAuth.extend({
+            clientId: 'client1',
+            recipients: {'server1': '12345'},
+            hmacPasses: 10
+        });
 
+        authApi = new AuthApi();
+
+        // Backbone.sync hook to provide bidirectional HMAC.
         function sync(method, model, options) {
-            /* Backbone.sync hook to provide bidirectional HMAC. */
-            var AuthApi = PyramidAuth.extend({
-                clientId: client_id,
-                hmacSecret: api_secret,
-                hmacPasses: hash_passes
-            });
-
-            auth = new AuthApi();
-
-            console.log(auth);
 
             // Outbound hmac.
             if (method === 'delete') {
-                options.headers = auth.send({}); // Delete has no payload.
+                options.headers = authApi.send({}, 'server1'); // Delete has no payload.
             } else {
-                options.headers = auth.send(model.toJSON(options));
+                options.headers = authApi.send(model.toJSON(options), 'server1');
             }
 
             var success = options.success;
+            // Inbound hmac callback.
             options.success = function(model, resp, xhr) {
-                // Inbound hmac.
-                auth.receive(xhr.responseJSON, xhr.getResponseHeader);
+                authApi.receive(xhr.responseJSON, xhr.getResponseHeader);
                 if (success)
                     success(model, resp, options);
             }
@@ -40,6 +35,4 @@ define(['jquery', 'underscore', 'backbone', 'pyramid_auth'],
         
         Backbone.Collection.prototype.sync = sync;
         Backbone.Model.prototype.sync = sync;
-
-        //return AuthApi;
     });
