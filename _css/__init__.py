@@ -3,4 +3,4 @@
 import os
 
 directory = os.path.dirname(__file__)
-templates = os.path.join(directory, 'data')
+css = os.path.join(directory, 'css')

@@ -1,7 +1,7 @@
-define(['backbone'],
-    function(Backbone) {
+define(['backbone', 'config'],
+    function(Backbone, Config) {
         var User = Backbone.Model.extend({
-            urlRoot: '/users',
+            urlRoot: Config.apiRoot + '/users',
             validate: function(attrs, options) {
                 /* Just some simple validation for a better UX */
                 validation_errors = [];
@@ -29,9 +29,12 @@ define(['backbone'],
         });
 
         var Users = Backbone.Collection.extend({
-            url: '/users',
+            url: Config.apiRoot + '/users',
             model: User
         });
 
-        return {User: User, Users: Users};
+        return {
+            User: User,
+            Users: Users
+        };
     });

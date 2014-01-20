@@ -3,13 +3,15 @@ define([
     'underscore',
     'backbone',
     'models_collections',
-    'text!users_list.tmpl.html',
+    'text!/js/tmpl/users_list.html.tmpl',
     'jquery_serialize_object',
     ],
     function($, _, Backbone, Models, users_list_tmpl) {
         
         var Users = Models.Users
+        
         var User = Models.User
+
         var UserList = Backbone.View.extend({
             el: '.page',
             events: {
