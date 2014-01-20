@@ -13,6 +13,7 @@ def validate(params=None, match=None):
         `params` - Schema to use to and instruct to validate requests.params
         `match` - Schema to use to and isntruct to validate request.match
     """
+    
     if params is None and match is None: # Validate the usage of the validator!
         raise ValueError("`validate` expected a `params` schema or a `match` "
                             "schema.")
@@ -20,6 +21,7 @@ def validate(params=None, match=None):
         raise ValueError("`params` expected a `formencode.Schema` type.")
     if match and not issubclass(match, Schema):
         raise ValueError("`match` expected a `formencode.Schema` type.")
+
     def _decorator(view_callable):
         def _inner(context, request):
             def validate_params(this):

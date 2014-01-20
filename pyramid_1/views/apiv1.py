@@ -1,13 +1,51 @@
+import os
+import uuid
+import base64
+
+from pyramid.security import remember
 from pyramid.view import view_config
 import pyramid.httpexceptions as exc
 
 from sqlalchemy.sql.expression import desc
 
-from restauth import auth_view_config
+from restauth import ping_view
 
 from ..models import DBSession, DBCommit, User
 from ..validators import validate, UserSchema, UserGetSchema
 from ..util import chained
+
+
+temp_users = {'user': 'pass'}
+
+
+# Auth Views
+# ==========
+# Not to be confused with REST auth but does instruct restauth after a
+# successful auth here.
+@view_config(permission='auth',
+                route_name='api_auth',
+                request_method='POST',
+                renderer='json')
+def auth(request):
+    # This will be connected to a redis backend soon enough. muahahahah!
+    params = request.json_body
+    user = params['name']
+    pass_ = params['pass']
+
+    if temp_users.get(user) == pass_:
+        client_id = str(uuid.uuid4())
+        secret = base64.b64encode(os.urandom(64)).decode('utf-8')
+        
+        #request.auth_api.add_client(client_id, secret)
+        remember(request, client_id, secret=secret)
+
+        ping_data = ping_view(request)
+        ping_data.update({'recipients': {request.auth_api.sender_id: secret},
+                'clientId': client_id,
+                'hmacPasses': 10})
+        return ping_data
+    else:
+        raise exc.HTTPUnauthorized()
 
 
 # View Utilities
@@ -34,15 +72,21 @@ def userdict(user):
 
 # Views
 # =====
-@auth_view_config(list, tight_auth=True, route_name='api_users',
-                    request_method='GET', renderer='json')
+# @auth_view_config(list, tight_auth=True,
+#                     permission='users_list',
+#                     route_name='api_users',
+#                     request_method='GET', renderer='json')
+@view_config(permission='inner_api',
+                route_name='api_users',
+                request_method='GET',
+                renderer='json')
 def users_get(request):
     """Query and return a list of users."""
     users = DBSession.query(User).order_by(desc(User.id)).all()
     return [userdict(user) for user in users]
 
 
-@auth_view_config(dict, tight_auth=True, decorator=validate(params=UserSchema),
+@view_config(permission='inner_api', decorator=validate(params=UserSchema),
                     route_name='api_users', request_method='POST', renderer='json')
 def users_post(request):
     """Create a new user."""
@@ -56,7 +100,7 @@ def users_post(request):
     return userdict(user)
 
 
-@auth_view_config(dict, tight_auth=True, decorator=chained(
+@view_config(permission='inner_api', decorator=chained(
                                     validate(match=UserGetSchema),
                                     get_user),
                 route_name='api_user', request_method='GET', renderer='json')
@@ -67,7 +111,7 @@ def user_get(context, request):
     return userdict(user)
 
 
-@auth_view_config(dict, tight_auth=True, decorator=chained(
+@view_config(permission='inner_api', decorator=chained(
                             validate(params=UserSchema, match=UserGetSchema),
                             get_user),
                 route_name='api_user', request_method='PUT', renderer='json')
@@ -86,7 +130,7 @@ def user_put(request):
     return userdict(user)
 
 
-@auth_view_config(dict, tight_auth=True, decorator=chained(
+@view_config(permission='inner_api', decorator=chained(
                                 validate(match=UserGetSchema),
                                 get_user),
                 route_name='api_user', request_method='DELETE', renderer='json')

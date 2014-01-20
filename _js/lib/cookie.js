@@ -3,6 +3,7 @@
  * @version	0.3
  * @desc 	JavaScript cookie manipulation class
  * 
+ * patch 0.3.1 - @adoc (not submitted)
  */
 
 Cookie = {	
@@ -14,10 +15,11 @@ Cookie = {
 	 */
 	get: function(key) {
 		// Still not sure that "[a-zA-Z0-9.()=|%/]+($|;)" match *all* allowed characters in cookies
-		tmp =  document.cookie.match((new RegExp(key +'=[a-zA-Z0-9.()=|%/]+($|;)','g')));
+		// @ adoc - update regeg to include at least '_' and '-'. This is not right either way.
+		var tmp = document.cookie.match((new RegExp(key +'=[a-zA-Z0-9.()=|%/_-]+($|;)','g')));
 		if(!tmp || !tmp[0]) return null;
 		else return unescape(tmp[0].substring(key.length+1,tmp[0].length).replace(';','')) || null;
-		
+			
 	},	
 	
 	/** Set a cookie
@@ -32,12 +34,13 @@ Cookie = {
 	 *  @return setted cookie
 	 */
 	set: function(key, value, ttl, path, domain, secure) {
-		cookie = [key+'='+    escape(value),
+		cookie = [key+'='+    encodeURIComponent(value),
 		 		  'path='+    ((!path   || path=='')  ? '/' : path),
 		 		  'domain='+  ((!domain || domain=='')?  window.location.hostname : domain)];
-		
-		if (ttl)         cookie.push(Cookie.hoursToExpireDate(ttl));
+		// @adoc - added "expires="
+		if (ttl)         cookie.push('expires=' + Cookie.hoursToExpireDate(ttl));
 		if (secure)      cookie.push('secure');
+
 		return document.cookie = cookie.join('; ');
 	},
 	
@@ -51,7 +54,8 @@ Cookie = {
 	unset: function(key, path, domain) {
 		path   = (!path   || typeof path   != 'string') ? '' : path;
         domain = (!domain || typeof domain != 'string') ? '' : domain;
-		if (Cookie.get(key)) Cookie.set(key, '', 'Thu, 01-Jan-70 00:00:01 GMT', path, domain);
+        // @adoc - removed timestamp here and simply use "-1" for ttl.
+		if (Cookie.get(key)) Cookie.set(key, '', -1, path, domain);
 	},
 
 	/** Return GTM date string of "now" + time to live

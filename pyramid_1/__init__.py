@@ -1,5 +1,6 @@
 from pyramid.config import Configurator
 from pyramid.session import UnencryptedCookieSessionFactoryConfig as SessionFactory
+from pyramid.authorization import ACLAuthorizationPolicy
 
 from sqlalchemy import engine_from_config
 
@@ -7,12 +8,23 @@ import restauth
 
 from .models import DBSession, Base
 
-
 from pyramid.asset import resolve_asset_spec
+
 
 def do(spec):
     name = resolve_asset_spec(spec)[0]
     return __import__(name, globals(), locals())
+
+
+from restauth import Guest, TightGuest
+from pyramid.security import Everyone, Authenticated, Allow
+
+
+class ACL(object):
+    __acl__ = [
+        (Allow, Guest, 'ping'),
+        (Allow, TightGuest, 'auth'),
+        (Allow, Authenticated, 'inner_api')]
 
 
 def main(global_config, **settings):
@@ -25,44 +37,48 @@ def main(global_config, **settings):
     DBSession.configure(bind=engine)
     Base.metadata.bind = engine
 
+    acl = ACL()
+
     # Configurator
     # ============
-    config = Configurator(settings=settings,
+    config = Configurator(
+                    settings=settings,
+                    root_factory=lambda r: acl,
                     session_factory=SessionFactory('pyramid_backbone_simple'))
     config.include('pyramid_chameleon')
     
     # Authentication API
     # ==================
-    # Note: Can I put this elsewhere? This is a little Pylons-ish
-    #   (except the config isn't global.)
-    rest_auth = restauth.PyramidAuthApiServer(
+    config.set_authentication_policy(
+                restauth.RestAuthnPolicy(
                     'server1',
-                    remotes={'client1': '12345'},
-                    passes=10)
-    config.add_settings({'auth_api': rest_auth})
-    
-    config.add_view(restauth.ping_view(), route_name='api_ping',
+                    remotes={'guest': 'Dyx3hRJs5XfcslWGKdRewSe2J85p8A4rxyIF4d0WHYphnfzOEE3ETQ9Kp4xojYeX'},
+                    passes=10))
+    config.set_authorization_policy(ACLAuthorizationPolicy())
+    config.add_view(restauth.ping_view, permission='ping', route_name='api_ping',
                     request_method='GET', renderer='json')
 
     # Routes
     # ======
     # Users RESTful API
     config.add_route('api_ping', '/api/v1/ping')
+    config.add_route('api_auth', '/api/v1/auth')
+
     config.add_route('api_users', '/api/v1/users')
     config.add_route('api_user', '/api/v1/users/{id}')
 
     # Site pages.
     config.add_route('site_index', '/')
+    config.add_route('site_login', '/login')
+    config.add_route('site_logout', '/logout')
     config.add_route('site_users', '/users')
 
+
     # Static Views
+    config.add_static_view('/css', path='_css:css', cache_max_age=0)
     config.add_static_view('/js/lib', path='_js:lib', cache_max_age=3660)
     config.add_static_view('/js/site', path='_js:site', cache_max_age=0)
     config.add_static_view('/js/tmpl', path='_templates:backbone', cache_max_age=0)
 
-
     config.scan()
-
-
-
     return config.make_wsgi_app()

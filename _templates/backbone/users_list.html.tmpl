@@ -1,0 +1,55 @@
+<form id="users_form">
+    <table class="table striped">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Awesomeness<br />Rating</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td class="form-group">
+                    <input class="form-control" type="text" name="new_name" size="32" maxlength="32" />
+                    <label class="control-label"></label>
+                </td>
+                <td class="form-group">
+                    <input class="form-control" type="text" name="new_value" size="3" maxlength="3" />
+                    <label class="control-label"></label>
+                </td>
+                <td class="form-group"><button type="button" name="new" class="btn">New User</button></td>
+            </tr>
+          <% _.each(users, function(user) { %>
+            <tr>
+              <% if (edit && user.get('id') == edit) { %>
+                <td class="form-group">
+                    <input class="form-control" type="text" name="edit_name" value="<%=user.get('name')%>" size="32" maxlength="32" />
+                    <label class="control-label"></label>
+                </td>
+                <td class="form-group">
+                    <input class="form-control" type="text" name="edit_value" value="<%=user.get('value')%>" size="3" maxlength="3" />
+                    <label class="control-label"></label>
+                </td>
+                <td class="form-group">
+                    <button type="button" name="save" class="btn btn-primary" data-id="<%=user.get('id')%>">Save</button>
+                    <button type="button" name="cancel" class="btn btn-warning" data-id="<%=user.get('id')%>">Cancel</button>
+                </td>
+              <% } else { %>
+                <td class="form-group">
+                    <input disabled="disabled" class="form-control" type="text" value="<%=user.get('name')%>" />
+                    <label class="control-label"></label>
+                </td>
+                <td class="form-group">
+                    <input disabled="disabled" class="form-control" type="text" value="<%=user.get('value')%>" />
+                    <label class="control-label"></label>
+                </td>
+                <td class="form-group">
+                    <button type="button" name="edit" class="btn btn-primary" data-id="<%=user.get('id')%>">Edit</button>
+                    <button type="button" name="delete" class="btn btn-warning" data-id="<%=user.get('id')%>">Delete</button>
+                </td>
+              <% } %>     
+            </tr>
+          <% }); %>
+        </tbody>
+    </table>
+</form>
