@@ -1,0 +1,52 @@
+[submodule "pyramid_1/static/lib/rest-auth"]
+	path = pyramid_1/static/lib/rest-auth
+	url = https://github.com/adoc/js-rest-auth
+[submodule "rest_auth"]
+	path = rest_auth
+	url = https://github.com/adoc/py-rest-auth
+[submodule "restauth"]
+	path = restauth
+	url = https://github.com/adoc/py-rest-auth
+[submodule "pyramid_1/static/lib/backbone-rest-auth"]
+
+	path = pyramid_1/static/lib/backbone-rest-auth
+
+	url = https://github.com/adoc/backbone-rest-auth
+
+[submodule "_js/site/backbone-rest-auth"]
+
+	path = _js/site/backbone-rest-auth
+	url = https://github.com/adoc/backbone-rest-auth
+
+[submodule "_js/site/py-rest-auth"]
+
+	path = _js/site/py-rest-auth
+
+	url = https://github.com/adoc/py-rest-auth
+
+[submodule "_js/site/js-rest-auth"]
+
+	path = _js/site/js-rest-auth
+
+	url = https://github.com/adoc/js-rest-auth
+
+[submodule "_js/site/js-cookies"]
+
+	path = _js/site/js-cookies
+
+	url = https://github.com/adoc/js-cookies
+
+[submodule "pkcs7"]
+
+	path = pkcs7
+
+	url = https://gist.github.com/8550490.git
+
+[submodule "aes"]
+
+	path = aes
+
+	url = https://gist.github.com/8551865.git
+[submodule "whmac"]
+	path = whmac
+	url = https://gist.github.com/8552289.git
