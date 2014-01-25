@@ -28,8 +28,9 @@ require.config({
         crypto_b64: [
             //'//crypto-js.googlecode.com/svn/tags/3.1.2/build/components/enc-base64',
             '/js/lib/crypto-enc-base64'],
-        cookie: '/js/lib/cookie',
-        cookies: '/js/site/js-cookies/cookies',
+        cookie: '//gist.github.com/adoc/8611630',
+        cookies: '//gist.github.com/adoc/8611566',
+        hmac: 'hmac/hmac',
         auth: 'backbone-rest-auth/auth',
         rest_auth: 'js-rest-auth/rest-auth',
     },
@@ -52,6 +53,9 @@ require.config({
         },
         crypto_b64: {
             deps: ['crypto_core']
+        },
+        hmac: {
+            deps: ['crypto_sha', 'crypto_hmac', 'crypto_b64']
         },
         rest_auth: {
             deps: ['crypto_sha', 'crypto_hmac']
