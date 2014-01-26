@@ -4,19 +4,15 @@ define(['backbone', 'views', 'auth', 'events'],
         var LoginFormHeading = Views.LoginFormHeading();
         var loginFormHeading = new LoginFormHeading();
 
-        Events.on('logged_out', function () {
+        Events.on('backbone_auth.logged_out', function () {
             console.log('logged_out');
-            Auth.api.logout();
+            Auth.api.restAuth.logout();
             Auth.remove_cookies();
-            //loginFormHeading.remove();
-            //loginFormHeading = new LoginFormHeading();
             loginFormHeading.render();
         });
 
-        Events.on('logged_in', function() {
-            //console.log('logged_in');
-            //loginFormHeading.remove();
-            //loginFormHeading = new LoginFormHeading();
+        Events.on('backbone_auth.logged_in', function() {
+            console.log('logged_in');
             loginFormHeading.render(true);
         })
 
@@ -26,7 +22,6 @@ define(['backbone', 'views', 'auth', 'events'],
                     '*path': 'home'
                 },
                 home: function (path) {
-
                 }
             })
         }
@@ -42,7 +37,7 @@ define(['backbone', 'views', 'auth', 'events'],
                 },
                 login: function(path) {
                     // Redirect if we are logged in.
-                    Events.on('logged_in', function () {
+                    Events.on('backbone_auth.logged_in', function () {
                         var hash = Backbone.history.location.hash;
 
                         if (hash) {
@@ -64,7 +59,7 @@ define(['backbone', 'views', 'auth', 'events'],
                 },
                 logout: function(path) {
                     Auth.remove_cookies();
-                    Events.trigger('logged_out');
+                    Events.trigger('backbone_auth.logged_out');
                 }
             })
         }
@@ -84,14 +79,13 @@ define(['backbone', 'views', 'auth', 'events'],
                     var that = this;
                     var notLoggedIn = new NotLoggedIn();
 
-                    if (Auth.api.authenticated) {
-                        Events.on('logged_out', function () {
+                    if (Auth.api.restAuth.authenticated) {
+                        Events.on('backbone_auth.logged_out', function () {
                             userList.remove();
                             userList.initialize();
                             notLoggedIn.render(that);
                         });
                         userList.render();
-
                     } 
                     else {
                         notLoggedIn.render(this);

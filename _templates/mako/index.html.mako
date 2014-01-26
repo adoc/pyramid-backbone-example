@@ -6,9 +6,12 @@
             Config.requireApi = true;
             Config.apiTight = true;
             Config.apiDefault = {
-                        recipients: {_any: "Dyx3hRJs5XfcslWGKdRewSe2J85p8A4rxyIF4d0WHYphnfzOEE3ETQ9Kp4xojYeX"},
-                        clientId: 'guest',
-                        hmacPasses: 10
+                        remotes: {
+                            _any: {
+                                secret: "Dyx3hRJs5XfcslWGKdRewSe2J85p8A4rxyIF4d0WHYphnfzOEE3ETQ9Kp4xojYeX",
+                                senderId: 'guest'
+                            }
+                        }
                     };
             App.initialize(Routes.HomeRouter());
         });

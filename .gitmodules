@@ -1,9 +1,6 @@
 [submodule "restauth"]
 	path = restauth
 	url = https://github.com/adoc/py-rest-auth
-[submodule "_js/site/backbone-rest-auth"]
-	path = _js/site/backbone-rest-auth
-	url = https://github.com/adoc/backbone-rest-auth
 [submodule "pkcs7"]
 	path = pkcs7
 	url = https://gist.github.com/8550490.git
@@ -44,3 +41,15 @@
 	path = _js/site/auth_client
 
 	url = https://gist.github.com/8613025.git
+
+[submodule "_js/site/backbone_auth"]
+
+	path = _js/site/backbone_auth
+
+	url = https://gist.github.com/8613376.git
+[submodule "_js/site/cookies"]
+	path = _js/site/cookies
+	url = https://gist.github.com/8611566.git
+[submodule "_js/lib/cookie"]
+	path = _js/lib/cookie
+	url = https://gist.github.com/8611630.git

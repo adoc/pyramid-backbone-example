@@ -33,16 +33,20 @@ def auth(request):
     pass_ = params['pass']
 
     if temp_users.get(user) == pass_:
-        client_id = str(uuid.uuid4())
+        sender_id = str(uuid.uuid4())
         secret = base64.b64encode(os.urandom(64)).decode('utf-8')
         
-        #request.auth_api.add_client(client_id, secret)
-        remember(request, client_id, secret=secret)
+        #request.auth_api.add_client(sender_id, secret)
+        remember(request, sender_id, secret=secret)
 
         ping_data = ping_view(request)
-        ping_data.update({'recipients': {request.auth_api.sender_id: secret},
-                'clientId': client_id,
-                'hmacPasses': 10})
+        
+        ping_data.update({'remotes': {
+                            request.auth_api.sender_id.decode(): {
+                                'senderId': sender_id,
+                                'secret': secret}}})
+
+        print (ping_data)
         return ping_data
     else:
         raise exc.HTTPUnauthorized()

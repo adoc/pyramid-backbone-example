@@ -23,6 +23,8 @@ from pyramid.security import Everyone, Authenticated, Allow
 class ACL(object):
     __acl__ = [
         (Allow, Guest, 'ping'),
+        (Allow, TightGuest, 'ping'),
+        (Allow, Authenticated, 'ping'),
         (Allow, TightGuest, 'auth'),
         (Allow, Authenticated, 'inner_api')]
 
@@ -51,9 +53,8 @@ def main(global_config, **settings):
     # ==================
     config.set_authentication_policy(
                 restauth.RestAuthnPolicy(
-                    'server1',
-                    remotes={'guest': 'Dyx3hRJs5XfcslWGKdRewSe2J85p8A4rxyIF4d0WHYphnfzOEE3ETQ9Kp4xojYeX'},
-                    passes=10))
+                    b'server1',
+                    remotes={b'guest': ('Dyx3hRJs5XfcslWGKdRewSe2J85p8A4rxyIF4d0WHYphnfzOEE3ETQ9Kp4xojYeX', '')}))
     config.set_authorization_policy(ACLAuthorizationPolicy())
     config.add_view(restauth.ping_view, permission='ping', route_name='api_ping',
                     request_method='GET', renderer='json')

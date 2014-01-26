@@ -70,7 +70,7 @@ define([
                     $('#login_form button[name="login"]').addClass("btn-warning");
 
                     // Refresh on login.
-                    Events.on('logged_in', function() {
+                    Events.on('backbone_auth.logged_in', function() {
                         router.refresh();
                     });
                 }
@@ -108,25 +108,7 @@ define([
                     login.on("invalid", invalidView(this, form));
 
                     login.save(userDetails, {
-                        success: function (model, resp, options) {
-                            // remember this is a model, so need to toJSON to
-                            // get the underlying data.
-                            var model = model.toJSON();
-                            delete model.name;
-                            delete model.pass;
-                            
-                            Cookies.set_cookies(model, {prefix: 'rest_auth'});
-
-                            Auth.api = _.extend(Auth.api, model);
-
-                            Auth.api.tight = true;
-                            Auth.api.authenticated = true;
-                            Auth.api.timeProvider.reset(model._time);
-                            Auth.api.clientIp = model._addr;
-
-                            Events.trigger('logged_in');  
-                        },
-
+                        success: Auth.api.loginSuccess,
                         error: function(xhr, Status) {
                             if(Status.status==401) {
                                 login.trigger('invalid', null , [
@@ -157,7 +139,7 @@ define([
                 },
 
                 logout: function() {
-                    Events.trigger('logged_out');
+                    Events.trigger('backbone_auth.logged_out');
                     return false;
                 },
 

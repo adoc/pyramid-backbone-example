@@ -18,14 +18,17 @@ define(['jquery', 'underscore', 'backbone', 'events', 'auth', 'cookies',
 
             // Initialize auth and success callback.
             Auth.api = Auth.initialize({
-                success: function () { Backbone.history.start() },
-                error: function () { Events.trigger('logged_out'); },
-                logged_in: function () { Events.trigger('logged_in'); },
-                logged_out: function () { Events.trigger('logged_out'); },
-                tight: Config.apiTight,
                 apiDefault: Config.apiDefault,
                 apiRoot: Config.apiRoot
             });
+
+            if (Config.apiTight) {
+                Events.on('backbone_auth.auth_tight', function () {
+                    Events.off('backbone_auth.auth_tight', this.prototype);
+                    Backbone.history.start();
+                });
+                Auth.api.tightenAuth();
+            }
         }
 
         return {initialize: initialize};
