@@ -1,3 +1,10 @@
+// Just a little helper since most of our Routers and Views are
+//  wrapped in functions.
+function getInstance(classInit) {
+    var Class = classInit();
+    return new Class();
+}
+
 require.config({
     baseUrl: "/js/site",
     paths: {

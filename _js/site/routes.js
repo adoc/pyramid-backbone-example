@@ -7,95 +7,74 @@ define([
     ],
     function(Backbone, Views, AuthViews, Auth, Events){
 
-        var LoginFormHeading = AuthViews.LoginFormHeading();
+        var NotLoggedIn = AuthViews.NotLoggedIn();
+
+        // Set up login form event hooks.
+        var LoginFormHeading = AuthViews.LoginFormHeading(); // Get the view "class".
         var loginFormHeading = new LoginFormHeading();
 
         Events.on('auth.logged_out', function () {
-            console.log('logged_out');
-            //Auth.api.restAuth.logout();
-            //Auth.remove_cookies();
+            console.log('auth.logged_out');
             loginFormHeading.render();
         });
 
         Events.on('auth.logged_in', function() {
-            console.log('logged_in');
+            console.log('auth.logged_in');
             loginFormHeading.render(true);
-        })
+        });
 
+        // Home/Root Router.
         var HomeRouter = function() {
             return Backbone.Router.extend({
                 routes: {
+                    'users': 'users',
                     '*path': 'home'
                 },
                 home: function (path) {
-                }
-            })
-        }
-
-        // Login page only.
-        var LoginRouter = function() {
-            var LoginForm = AuthViews.LoginForm();
-            var loginForm = new LoginForm();
-
-            return Backbone.Router.extend({
-                routes: {
-                    '*path': 'login'
                 },
-                login: function(path) {
-                    // Redirect if we are logged in.
-                    Events.on('auth.logged_in', function () {
-                        var hash = Backbone.history.location.hash;
-
-                        if (hash) {
-                            window.location = hash.slice(1);
-                        } else {
-                            window.location = '/'; // Set this elsewhere.
-                        }
-                    });
-                    loginForm.render();
-                }
-            })
-        }
-
-        // Logout link only.
-        var LogoutRouter = function() {
-            return Backbone.Router.extend({
-                routes: {
-                    '*path': 'logout'
+                users: function () {
+                    var usersListRouter = getInstance(UsersListRouter);
+                    usersListRouter.refresh();
                 },
-                logout: function(path) {
-                    Events.trigger('view.logged_out');
-                    Events.trigger('auth.logged_out');
+                logout: function () {
+                    
                 }
-            })
+            });
         }
-        
-        var NotLoggedIn = AuthViews.NotLoggedIn();
-        
-        //
+
         var UsersListRouter = function() {
-            var UserList = Views.UserList(); // Init the view object.
-            var userList = new UserList(); // Construct the view object.
-
-            return Backbone.Router.extend({
+            var UserList = Views.UserList(); // Get the view "class".
+            return Auth.AuthRequiredRouter.extend({
                 routes: {
                     '*path': 'users_list'
                 },
-                users_list: function(path) {
+                // Set up some views.
+                initialize: function() {
+                    this.userList = new UserList();
+                    this.notLoggedIn = new NotLoggedIn();
+                    this.auth_required(); // Initialize auth_required.
+                },
+                // Render Not-Logged-In form.
+                not_loggedin: function() {
                     var that = this;
-                    var notLoggedIn = new NotLoggedIn();
-
-                    if (Auth.api.restAuth.authenticated) {
-                        Events.on('auth.logged_out', function () {
-                            userList.remove();
-                            userList.initialize();
-                            notLoggedIn.render(that);
-                        });
-                        userList.render();
-                    } 
-                    else {
-                        notLoggedIn.render(this);
-                    }
+                    // Hook event to refresh router 
+                    Events.on('auth.logged_in', function () {
+                        that.userList = new UserList();
+                        that.refresh();
+                    });
+                    this.notLoggedIn.render();
+                },
+                // Render Users-List.
+                users_list: function() {
+                    var that = this;
+                    // Hook event to remove userlist and render
+                    //  not-logged-in form.
+                    Events.on('auth.logged_out', function () {
+                        that.userList.remove();
+                        that.userList.initialize();
+                        that.not_loggedin();
+                    });
+                    this.userList.render();
                 }
             });
         }
@@ -103,8 +82,8 @@ define([
         // Return routes.
         return {
             HomeRouter: HomeRouter,
-            LoginRouter: LoginRouter,
-            LogoutRouter: LogoutRouter,
+            LoginRouter: function() { return Auth.LoginRouter(AuthViews.LoginForm()); },
+            LogoutRouter: Auth.LogoutRouter,
             UsersListRouter: UsersListRouter
         };
     });

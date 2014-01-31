@@ -5,18 +5,13 @@
             // Initialize backbone.js app.
             Config.requireApi = true;
             Config.apiTight = true;
-            Config.apiDefault = {
-                        remotes: {
-                            _any: {
-                                secret: "Dyx3hRJs5XfcslWGKdRewSe2J85p8A4rxyIF4d0WHYphnfzOEE3ETQ9Kp4xojYeX",
-                                senderId: 'guest'
-                            }
-                        }
-                    };
+            Config.apiDefault = {remotes: ${remotes|n}};
             App.initialize(Routes.HomeRouter());
         });
 </%def>
 <div class="container">
-    <h3>Welcome!</h3>
-    <p>This is where things happen!</p>
+    <div class="page">
+        <h3>Welcome!</h3>
+        <p>This is where things happen!</p>
+    </div>
 </div>

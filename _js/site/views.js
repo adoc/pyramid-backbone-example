@@ -8,14 +8,6 @@ define([
     ],
     function($, _, Backbone, Models, users_list_tmpl) {
 
-        // Custom Remove View;
-        Backbone.View.prototype.remove = function() {
-            this.undelegateEvents();
-            this.$el.empty();
-            this.stopListening();
-            return this;
-        }
-
         var invalidForm = function(that, form, prefix) {
             /* Update view with errors/warnings for form validation. */
             function inner(model, errors) {
@@ -91,7 +83,6 @@ define([
                         }
                     });
                 },
-
                 invalidForm: function(form, prefix) {
                     /* Update view with errors/warnings for form validation. */
                     var that = this;
@@ -121,9 +112,8 @@ define([
                     /* */
                     return $(ev.currentTarget).data('id');
                 },
+                // New user intent. Serialize and save. 
                 newUser: function(ev) {
-                    /* New user intent. Serialize and save. 
-                    */
                     var that = this;
                     var form = $(ev.currentTarget).closest('form');
                     var obj = form.serializeObject();
@@ -152,6 +142,7 @@ define([
                     var obj = form.serializeObject();
                     var userDetails = {name: obj.edit_name, value:obj.edit_value};
                     var id = this.getUserId(ev);
+                    console.log(id);
                     var user = this.users.get(id);
 
                     user.on("invalid", this.invalidForm(form, 'edit'));

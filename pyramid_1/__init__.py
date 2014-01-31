@@ -22,6 +22,7 @@ from pyramid.security import Everyone, Authenticated, Allow
 
 class ACL(object):
     __acl__ = [
+        (Allow, Everyone, 'scaffold'),
         (Allow, Guest, 'ping'),
         (Allow, TightGuest, 'ping'),
         (Allow, Authenticated, 'ping'),
