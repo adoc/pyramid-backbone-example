@@ -1,8 +1,8 @@
 import os
-import uuid
+
 import base64
 
-from pyramid.security import remember
+from pyramid.security import remember, forget
 from pyramid.view import view_config
 import pyramid.httpexceptions as exc
 
@@ -33,21 +33,7 @@ def auth(request):
     pass_ = params['pass']
 
     if temp_users.get(user) == pass_:
-        sender_id = str(uuid.uuid4())
-        secret = base64.b64encode(os.urandom(64)).decode('utf-8')
-        
-        #request.auth_api.add_client(sender_id, secret)
-        remember(request, sender_id, secret=secret)
-
-        ping_data = ping_view(request)
-        
-        ping_data.update({'remotes': {
-                            request.auth_api.sender_id.decode(): {
-                                'senderId': sender_id,
-                                'secret': secret}}})
-
-        print (ping_data)
-        return ping_data
+        return remember(request, None)
     else:
         raise exc.HTTPUnauthorized()
 

@@ -1,6 +1,5 @@
-define(['jquery', 'underscore', 'backbone', 'events', 'auth', 'cookies',
-    'config'],
-    function($, _, Backbone, Events, Auth, Cookies, Config) {
+define(['jquery', 'underscore', 'backbone', 'events', 'auth', 'config'],
+    function($, _, Backbone, Events, Auth, Config) {
 
         Backbone.Router.prototype.refresh = function() {
             //http://stackoverflow.com/a/8991969
@@ -23,8 +22,8 @@ define(['jquery', 'underscore', 'backbone', 'events', 'auth', 'cookies',
             });
 
             if (Config.apiTight) {
-                Events.on('backbone_auth.auth_tight', function () {
-                    Events.off('backbone_auth.auth_tight', this.prototype);
+                Events.on('auth.auth_tight', function () {
+                    Events.off('auth.auth_tight', this.prototype);
                     Backbone.history.start();
                 });
                 Auth.api.tightenAuth();

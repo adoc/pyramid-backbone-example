@@ -1,40 +1,21 @@
 require.config({
     baseUrl: "/js/site",
     paths: {
-        jquery: [
-            //'//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min',
-            '/js/lib/jquery-min'],
-        underscore: [
-            //'//cdnjs.cloudflare.com/ajax/libs/underscore.js/1.5.2/underscore-min',
-            '/js/lib/underscore-min'],
-        backbone: [
-            //'//cdnjs.cloudflare.com/ajax/libs/backbone.js/1.1.0/backbone-min',
-            '/js/lib/backbone-min'],
-        text: [
-            //'//cdnjs.cloudflare.com/ajax/libs/require-text/2.0.10/text',
-            '/js/lib/text'],
-        jquery_serialize_object: [
-            //'//cdnjs.cloudflare.com/ajax/libs/jquery-serialize-object/2.0.0/jquery.serialize-object.compiled',
-            '/js/lib/jquery.serialize-object.compiled'],
-        crypto_core: [
-            //'//crypto-js.googlecode.com/svn/tags/3.1.2/build/components/core',
-            '/js/lib/crypto-core'],
-        crypto_sha: [
-            //'//crypto-js.googlecode.com/svn/tags/3.1.2/build/components/sha256',
-            '/js/lib/crypto-sha256'],
-        crypto_hmac: [
-            //'//crypto-js.googlecode.com/svn/tags/3.1.2/build/components/hmac',
-            '/js/lib/crypto-hmac'],
-        crypto_b64: [
-            //'//crypto-js.googlecode.com/svn/tags/3.1.2/build/components/enc-base64',
-            '/js/lib/crypto-enc-base64'],
-        rng: '//webmob.net/rng',
-        cookie: '/js/lib/cookie/cookie',
-        cookies: 'cookies/cookies',
+        jquery: '/js/lib/jquery-min',
+        underscore: '/js/lib/underscore-min',
+        backbone: '/js/lib/backbone-min',
+        text: '/js/lib/text',
+        jquery_serialize_object: '/js/lib/jquery.serialize-object.compiled',
+        crypto_core: '/js/lib/crypto-core',
+        crypto_sha: '/js/lib/crypto-sha256',
+        crypto_hmac: '/js/lib/crypto-hmac',
+        crypto_b64: '/js/lib/crypto-enc-base64',
+        rng: '/js/lib/rng',
         bytes: 'bytes/bytes',
         hmac: 'hmac/hmac',
         auth_client: 'auth_client/auth_client',
-        auth: 'backbone_auth/backbone_auth',
+        persist: '/js/lib/persist-min',
+        auth: 'backbone_auth/backbone_auth'
     },
     shim: {
         backbone: {
@@ -61,6 +42,12 @@ require.config({
         },
         auth_client: {
             deps: ['bytes', 'crypto_b64', 'rng', 'hmac']
+        },
+        persist: {
+            exports: 'Persist'
+        },
+        auth: {
+            deps: ['persist']
         }
     },
     timeout: 1

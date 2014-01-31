@@ -26,6 +26,7 @@ class ACL(object):
         (Allow, TightGuest, 'ping'),
         (Allow, Authenticated, 'ping'),
         (Allow, TightGuest, 'auth'),
+        (Allow, Authenticated, 'auth_logout'),
         (Allow, Authenticated, 'inner_api')]
 
 
@@ -54,10 +55,14 @@ def main(global_config, **settings):
     config.set_authentication_policy(
                 restauth.RestAuthnPolicy(
                     b'server1',
-                    remotes={b'guest': ('Dyx3hRJs5XfcslWGKdRewSe2J85p8A4rxyIF4d0WHYphnfzOEE3ETQ9Kp4xojYeX', '')}))
+                    remotes={b'guest': {'secret': b'Dyx3hRJs5XfcslWGKdRewSe2J85p8A4rxyIF4d0WHYphnfzOEE3ETQ9Kp4xojYeX', 
+                                        'key': b''}}))
     config.set_authorization_policy(ACLAuthorizationPolicy())
     config.add_view(restauth.ping_view, permission='ping', route_name='api_ping',
                     request_method='GET', renderer='json')
+    config.add_view(restauth.logout_view, permission='auth_logout',
+                    route_name='api_auth', request_method="DELETE",
+                    renderer='json')
 
     # Routes
     # ======

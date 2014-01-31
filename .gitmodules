@@ -9,47 +9,22 @@
 	url = https://gist.github.com/8551865.git
 [submodule "whmac"]
 	path = whmac
-
 	url = https://gist.github.com/8552289.git
-
 [submodule "message"]
-
 	path = message
-
 	url = https://gist.github.com/8553444.git
-
 [submodule "_js/site/hmac"]
-
 	path = _js/site/hmac
-
 	url = https://gist.github.com/8611494.git
-
 [submodule "_js/site/bytes"]
-
 	path = _js/site/bytes
-
 	url = https://gist.github.com/8612321.git
-
 [submodule "_js/site/auth"]
-
 	path = _js/site/auth
-
 	url = https://gist.github.com/8613025.git
-
 [submodule "_js/site/auth_client"]
-
 	path = _js/site/auth_client
-
 	url = https://gist.github.com/8613025.git
-
 [submodule "_js/site/backbone_auth"]
-
 	path = _js/site/backbone_auth
-
 	url = https://gist.github.com/8613376.git
-[submodule "_js/site/cookies"]
-	path = _js/site/cookies
-	url = https://gist.github.com/8611566.git
-[submodule "_js/lib/cookie"]
-	path = _js/lib/cookie
-	url = https://gist.github.com/8611630.git

@@ -2,18 +2,13 @@ define([
     'jquery',
     'underscore',
     'backbone',
-    'cookies',
     'models_collections',
-    'events',
-    'auth',
-    'text!/js/tmpl/login.html.tmpl',
-    'text!/js/tmpl/login_waiting.html.tmpl',
-    'text!/js/tmpl/logout.html.tmpl',
     'text!/js/tmpl/users_list.html.tmpl',
     'jquery_serialize_object',
     ],
-    function($, _, Backbone, Cookies, Models, Events, Auth, login_tmpl, login_waiting_tmpl, logout_tmpl, users_list_tmpl) {
+    function($, _, Backbone, Models, users_list_tmpl) {
 
+        // Custom Remove View;
         Backbone.View.prototype.remove = function() {
             this.undelegateEvents();
             this.$el.empty();
@@ -21,7 +16,7 @@ define([
             return this;
         }
 
-        var invalidView = function(that, form, prefix) {
+        var invalidForm = function(that, form, prefix) {
             /* Update view with errors/warnings for form validation. */
             function inner(model, errors) {
                 /* validation error handler for this view. */
@@ -55,112 +50,6 @@ define([
                 }
             }
             return inner;
-        }
-
-        var NotLoggedIn = function () {
-            return Backbone.View.extend({
-                el: '.page',
-                render: function (router) {
-                    var template = _.template(login_waiting_tmpl);
-                    this.$el.html(template);
-
-                    // Highlight login form.
-                    $("#login_form").addClass('has-warning');
-                    $('#login_form button[name="login"]').removeClass("btn-primary");
-                    $('#login_form button[name="login"]').addClass("btn-warning");
-
-                    // Refresh on login.
-                    Events.on('backbone_auth.logged_in', function() {
-                        router.refresh();
-                    });
-                }
-            });
-        }
-
-        var LoginForm = function() {
-            var Login = Models.Login;
-
-            return Backbone.View.extend({
-                el: '#login_form',
-                events: {'submit #login_form': 'loginEvent',
-                        'click button[name="login"]': 'loginEvent'},
-
-                initialize: function () {
-                    this.login = new Login();
-                },
-
-                render: function(edit) {
-
-                    /* Render the data/template only. */
-                    var template = _.template(login_tmpl, {
-                            login: this.login,
-                        });
-                    this.$el.html(template);
-                    this.invalid = false;
-                },
-
-                loginEvent: function(ev) {
-                    var that = this;
-                    var form = $(ev.currentTarget).closest('form');
-                    var obj = form.serializeObject();
-                    var userDetails = {name: obj.name, pass:obj.pass};
-                    var login = new Login();
-                    login.on("invalid", invalidView(this, form));
-
-                    login.save(userDetails, {
-                        success: Auth.api.loginSuccess,
-                        error: function(xhr, Status) {
-                            if(Status.status==401) {
-                                login.trigger('invalid', null , [
-                                    {'form': form,
-                                    'msg': "User or Password is incorrect."}]);
-                                return false;
-                            } 
-                            else if (Status.status==403) {
-
-                            }
-                        }
-                    });
-
-                    return false;
-                },
-
-
-            });
-        }
-
-        var LoginFormHeading = function() {
-            return LoginForm().extend({
-                el: '#login_form_container',
-                events: {
-                        'submit #login_form': 'loginEvent',
-                        'click button[name="login"]': 'loginEvent',
-                        'click button[name="logout"]': 'logout'
-                },
-
-                logout: function() {
-                    Events.trigger('backbone_auth.logged_out');
-                    return false;
-                },
-
-                render: function(logout) {
-                    if (logout) {
-                        var template = _.template(logout_tmpl, {
-                                            login: this.login,
-                                        });
-
-                    }
-                    else {
-                        var template = _.template(login_tmpl, {
-                                            login: this.login,
-                                        });
-                    }
-                    this.$el.html(
-                            '<form id="login_form" class="nav navbar-form navbar-left">' +
-                            template +
-                            '</form>');
-                }
-            });
         }
 
         var UserList = function() {
@@ -203,7 +92,7 @@ define([
                     });
                 },
 
-                invalidView: function(form, prefix) {
+                invalidForm: function(form, prefix) {
                     /* Update view with errors/warnings for form validation. */
                     var that = this;
                     function inner(model, errors) {
@@ -240,7 +129,7 @@ define([
                     var obj = form.serializeObject();
                     var userDetails = {name: obj.new_name, value:obj.new_value};
                     user = new User();
-                    user.on("invalid", this.invalidView(form, 'new'));
+                    user.on("invalid", this.invalidForm(form, 'new'));
                     user.save(userDetails, {
                         success: function () {
                             that.users.add(user);
@@ -265,7 +154,7 @@ define([
                     var id = this.getUserId(ev);
                     var user = this.users.get(id);
 
-                    user.on("invalid", this.invalidView(form, 'edit'));
+                    user.on("invalid", this.invalidForm(form, 'edit'));
                     user.set(userDetails, {validate: true});
                     if (user.hasChanged()) { // Does .save really not check to see if the model has changed?
                         user.save(userDetails, {
@@ -316,9 +205,7 @@ define([
         }
 
         return {
-            NotLoggedIn: NotLoggedIn,
-            LoginForm: LoginForm,
-            LoginFormHeading: LoginFormHeading,
+            invalidForm: invalidForm,
             UserList: UserList
         };
     });
