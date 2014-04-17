@@ -7,8 +7,8 @@
       %else:
         <title>Backbone/Pyramid</title>
       %endif
-        <link href="//netdna.bootstrapcdn.com/bootstrap/3.0.3/css/bootstrap.min.css" rel="stylesheet">
-        <link href="/css/root.css" rel="stylesheet">
+        <link href="//netdna.bootstrapcdn.com/bootstrap/3.0.3/css/bootstrap.min.css" rel="stylesheet" />
+        <link href="/css/root.css" rel="stylesheet" />
     </head>
     <body>
         <nav class="navbar navbar-default" role="navigation">

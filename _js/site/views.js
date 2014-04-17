@@ -42,7 +42,7 @@ define([
                 }
             }
             return inner;
-        }
+        };
 
         var UserList = function() {
             var Users = Models.Users;
@@ -140,7 +140,8 @@ define([
                     var that = this;
                     var form = $(ev.currentTarget).closest('form');
                     var obj = form.serializeObject();
-                    var userDetails = {name: obj.edit_name, value:obj.edit_value};
+                    var userDetails = {name: obj.edit_name,
+                                        value:obj.edit_value};
                     var id = this.getUserId(ev);
                     console.log(id);
                     var user = this.users.get(id);
